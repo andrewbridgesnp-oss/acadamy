@@ -909,7 +909,10 @@ export default function Academy() {
     <div className="min-h-screen bg-background text-foreground">
       {showGate && !proUnlocked ? (
         <ProGate
-          onOpenPricing={() => window.dispatchEvent(new Event("synckaiden:openPricing"))}
+          onOpenPricing={() => {
+            setShowGate(false);
+            window.dispatchEvent(new Event("synckaiden:openPricing"));
+          }}
           onUnlocked={() => {
             setProUnlockedState(isProUnlocked());
             setShowGate(false);

@@ -15,6 +15,18 @@ export default function AppLayout() {
     setPro(isProUnlocked());
   }, [pricingOpen, location.key]);
 
+  React.useEffect(() => {
+    function handleOpenPricing() {
+      setPricingOpen(true);
+    }
+
+    window.addEventListener("synckaiden:openPricing", handleOpenPricing);
+
+    return () => {
+      window.removeEventListener("synckaiden:openPricing", handleOpenPricing);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
