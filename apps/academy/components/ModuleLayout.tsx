@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import '../app/globals.css';
 import { ModuleRegistryEntry, currentUser, describeAccess, getAccessState, tierLabels } from '../lib/data';
 
 type ModuleLayoutProps = {

@@ -1,6 +1,4 @@
 import React from 'react';
-import '../app/globals.css';
-
 type ModuleSectionProps = {
   title: string;
   description?: string;
