@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -741,9 +741,19 @@ export default function Academy({ embed = false, openPricing: openPricingProp, c
   const { openPricing: outletOpenPricing, closePricing: outletClosePricing } = useOutletContext?.() || {};
   const [localPricingOpen, setLocalPricingOpen] = useState(false);
 
-  const hasSharedPricingControls = Boolean(openPricingProp || outletOpenPricing);
-  const openPricing = openPricingProp ?? outletOpenPricing ?? (() => setLocalPricingOpen(true));
-  const closePricing = closePricingProp ?? outletClosePricing ?? (() => setLocalPricingOpen(false));
+  const sharedOpenPricing = openPricingProp ?? outletOpenPricing;
+  const sharedClosePricing = closePricingProp ?? outletClosePricing;
+  const hasSharedPricingControls = Boolean(sharedOpenPricing && sharedClosePricing);
+
+  const openPricing = useCallback(() => {
+    setLocalPricingOpen(true);
+    sharedOpenPricing?.();
+  }, [sharedOpenPricing]);
+
+  const closePricing = useCallback(() => {
+    setLocalPricingOpen(false);
+    sharedClosePricing?.();
+  }, [sharedClosePricing]);
 
   const masteryPercent = useMemo(() => computeMasteryPercent(state), [state]);
   const module = useMemo(() => CORE_MODULES.find((m) => m.id === activeModuleId) || CORE_MODULES[0], [activeModuleId]);
