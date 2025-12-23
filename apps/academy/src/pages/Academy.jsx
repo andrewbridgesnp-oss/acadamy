@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -736,6 +737,7 @@ export default function Academy() {
   const [tab, setTab] = useState("learn");
   const [showGate, setShowGate] = useState(false);
   const [proUnlocked, setProUnlockedState] = useState(() => isProUnlocked());
+  const { openPricing } = useOutletContext?.() || {};
 
   const masteryPercent = useMemo(() => computeMasteryPercent(state), [state]);
   const module = useMemo(() => CORE_MODULES.find((m) => m.id === activeModuleId) || CORE_MODULES[0], [activeModuleId]);
@@ -911,7 +913,7 @@ export default function Academy() {
         <ProGate
           onOpenPricing={() => {
             setShowGate(false);
-            window.dispatchEvent(new Event("synckaiden:openPricing"));
+            openPricing?.();
           }}
           onUnlocked={() => {
             setProUnlockedState(isProUnlocked());

@@ -15,19 +15,8 @@ export default function AppLayout() {
     setPro(isProUnlocked());
   }, [pricingOpen, location.key]);
 
-  React.useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
-    function handleOpenPricing() {
-      setPricingOpen(true);
-    }
-
-    window.addEventListener("synckaiden:openPricing", handleOpenPricing);
-
-    return () => {
-      window.removeEventListener("synckaiden:openPricing", handleOpenPricing);
-    };
-  }, []);
+  const openPricing = React.useCallback(() => setPricingOpen(true), []);
+  const closePricing = React.useCallback(() => setPricingOpen(false), []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -69,7 +58,7 @@ export default function AppLayout() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <Outlet />
+        <Outlet context={{ openPricing, closePricing }} />
       </main>
 
       <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
