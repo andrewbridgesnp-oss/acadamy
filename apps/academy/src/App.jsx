@@ -16,6 +16,8 @@ export default function AppLayout() {
   }, [pricingOpen, location.key]);
 
   React.useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
     function handleOpenPricing() {
       setPricingOpen(true);
     }
