@@ -1,6 +1,4 @@
 import React from 'react';
-import '../app/globals.css';
-
 type StatCardProps = {
   label: string;
   value: string;
