@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { ProGate } from "@/components/ProGate";
+import { PricingModal } from "@/components/PricingModal";
 import { isProUnlocked } from "@/lib/pro";
 
 /**
@@ -725,7 +727,7 @@ function isSameDay(iso) {
   return iso === todayISO();
 }
 
-export default function Academy() {
+export default function Academy({ embed = false, openPricing: openPricingProp, closePricing: closePricingProp }) {
   const [state, setState] = useState(() => loadState());
   const [activeModuleId, setActiveModuleId] = useState(CORE_MODULES[0]?.id || "agents");
   const [intelText, setIntelText] = useState("{");
@@ -736,6 +738,22 @@ export default function Academy() {
   const [tab, setTab] = useState("learn");
   const [showGate, setShowGate] = useState(false);
   const [proUnlocked, setProUnlockedState] = useState(() => isProUnlocked());
+  const { openPricing: outletOpenPricing, closePricing: outletClosePricing } = useOutletContext?.() || {};
+  const [localPricingOpen, setLocalPricingOpen] = useState(false);
+
+  const sharedOpenPricing = openPricingProp ?? outletOpenPricing;
+  const sharedClosePricing = closePricingProp ?? outletClosePricing;
+  const hasSharedPricingControls = Boolean(sharedOpenPricing && sharedClosePricing);
+
+  const openPricing = useCallback(() => {
+    setLocalPricingOpen(true);
+    sharedOpenPricing?.();
+  }, [sharedOpenPricing]);
+
+  const closePricing = useCallback(() => {
+    setLocalPricingOpen(false);
+    sharedClosePricing?.();
+  }, [sharedClosePricing]);
 
   const masteryPercent = useMemo(() => computeMasteryPercent(state), [state]);
   const module = useMemo(() => CORE_MODULES.find((m) => m.id === activeModuleId) || CORE_MODULES[0], [activeModuleId]);
@@ -909,7 +927,10 @@ export default function Academy() {
     <div className="min-h-screen bg-background text-foreground">
       {showGate && !proUnlocked ? (
         <ProGate
-          onOpenPricing={() => window.dispatchEvent(new Event("synckaiden:openPricing"))}
+          onOpenPricing={() => {
+            setShowGate(false);
+            openPricing?.();
+          }}
           onUnlocked={() => {
             setProUnlockedState(isProUnlocked());
             setShowGate(false);
@@ -1559,6 +1580,10 @@ export default function Academy() {
           Built for: shipping daily, with guardrails. This MVP is offline-first—connect it to live feeds later.
         </footer>
       </div>
+
+      {hasSharedPricingControls ? null : (
+        <PricingModal open={localPricingOpen} onOpenChange={(open) => (open ? openPricing() : closePricing())} />
+      )}
     </div>
   );
 }

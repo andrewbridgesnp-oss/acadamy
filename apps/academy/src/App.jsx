@@ -15,6 +15,9 @@ export default function AppLayout() {
     setPro(isProUnlocked());
   }, [pricingOpen, location.key]);
 
+  const openPricing = React.useCallback(() => setPricingOpen(true), []);
+  const closePricing = React.useCallback(() => setPricingOpen(false), []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
@@ -55,7 +58,7 @@ export default function AppLayout() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <Outlet />
+        <Outlet context={{ openPricing, closePricing }} />
       </main>
 
       <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
