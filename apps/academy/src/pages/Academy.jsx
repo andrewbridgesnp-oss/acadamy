@@ -31,6 +31,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { ProGate } from "@/components/ProGate";
+import { PricingModal } from "@/components/PricingModal";
 import { isProUnlocked } from "@/lib/pro";
 
 /**
@@ -726,7 +727,7 @@ function isSameDay(iso) {
   return iso === todayISO();
 }
 
-export default function Academy() {
+export default function Academy({ embed = false, openPricing: openPricingProp, closePricing: closePricingProp }) {
   const [state, setState] = useState(() => loadState());
   const [activeModuleId, setActiveModuleId] = useState(CORE_MODULES[0]?.id || "agents");
   const [intelText, setIntelText] = useState("{");
@@ -737,7 +738,12 @@ export default function Academy() {
   const [tab, setTab] = useState("learn");
   const [showGate, setShowGate] = useState(false);
   const [proUnlocked, setProUnlockedState] = useState(() => isProUnlocked());
-  const { openPricing } = useOutletContext?.() || {};
+  const { openPricing: outletOpenPricing, closePricing: outletClosePricing } = useOutletContext?.() || {};
+  const [localPricingOpen, setLocalPricingOpen] = useState(false);
+
+  const hasSharedPricingControls = Boolean(openPricingProp || outletOpenPricing);
+  const openPricing = openPricingProp ?? outletOpenPricing ?? (() => setLocalPricingOpen(true));
+  const closePricing = closePricingProp ?? outletClosePricing ?? (() => setLocalPricingOpen(false));
 
   const masteryPercent = useMemo(() => computeMasteryPercent(state), [state]);
   const module = useMemo(() => CORE_MODULES.find((m) => m.id === activeModuleId) || CORE_MODULES[0], [activeModuleId]);
@@ -1564,6 +1570,10 @@ export default function Academy() {
           Built for: shipping daily, with guardrails. This MVP is offline-first—connect it to live feeds later.
         </footer>
       </div>
+
+      {hasSharedPricingControls ? null : (
+        <PricingModal open={localPricingOpen} onOpenChange={(open) => (open ? openPricing() : closePricing())} />
+      )}
     </div>
   );
 }
