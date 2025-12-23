@@ -930,6 +930,7 @@ export default function Academy({ embed = false, openPricing: openPricingProp, c
           onOpenPricing={() => {
             setShowGate(false);
             openPricing?.();
+            window.dispatchEvent(new Event("synckaiden:openPricing"));
           }}
           onUnlocked={() => {
             setProUnlockedState(isProUnlocked());
