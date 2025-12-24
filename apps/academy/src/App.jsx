@@ -15,6 +15,15 @@ export default function AppLayout() {
     setPro(isProUnlocked());
   }, [pricingOpen, location.key]);
 
+  React.useEffect(() => {
+    function handleExternalPricing() {
+      setPricingOpen(true);
+    }
+
+    window.addEventListener("synckaiden:openPricing", handleExternalPricing);
+    return () => window.removeEventListener("synckaiden:openPricing", handleExternalPricing);
+  }, []);
+
   const openPricing = React.useCallback(() => setPricingOpen(true), []);
   const closePricing = React.useCallback(() => setPricingOpen(false), []);
 
